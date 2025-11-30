@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Enter PIN</title>
+  <link rel="stylesheet" href="{{ url_for('static', path='style.css') }}">
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: #f9f9f9;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+    }
+    .container {
+      text-align: center;
+      background: white;
+      padding: 40px;
+      border-radius: 15px;
+      box-shadow: 0 0 15px rgba(0,0,0,0.1);
+    }
+    h1 {
+      color: #007bff;
+    }
+    .keypad {
+      margin-top: 20px;
+    }
+    .keys button {
+      font-size: 1.2em;
+      margin: 5px;
+      width: 60px;
+      height: 60px;
+      border: none;
+      border-radius: 8px;
+      background: #007bff;
+      color: white;
+      cursor: pointer;
+      transition: background 0.3s;
+    }
+    .keys button:hover {
+      background: #0056b3;
+    }
+    .keys .clear {
+      background: #dc3545;
+    }
+    .keys .ok {
+      background: #28a745;
+    }
+    footer {
+      margin-top: 15px;
+      font-size: 0.9em;
+      color: #555;
+    }
+    #pin-input {
+      text-align: center;
+      font-size: 1.5em;
+      margin-top: 10px;
+      border: 2px solid #ccc;
+      border-radius: 10px;
+      width: 150px;
+      padding: 10px;
+      letter-spacing: 8px;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>🔐 Enter UPI PIN</h1>
+    <p>Amount to pay: 💰 ₹{{ '%.2f'|format(amount) }}</p>
+
+    <!-- ✅ Send amount to success page -->
+    <form id="pin-form" action="/success" method="get">
+      <input type="hidden" name="amount" value="{{ amount }}">
+
+      <input 
+        type="password" 
+        id="pin-input" 
+        name="pin"
+        maxlength="6" 
+        readonly 
+        placeholder="••••••" 
+        required 
+      />
+
+      <div class="keypad">
+        <div class="keys">
+          <button type="button" onclick="pressKey('1')">1</button>
+          <button type="button" onclick="pressKey('2')">2</button>
+          <button type="button" onclick="pressKey('3')">3</button>
+          <button type="button" onclick="pressKey('4')">4</button>
+          <button type="button" onclick="pressKey('5')">5</button>
+          <button type="button" onclick="pressKey('6')">6</button>
+          <button type="button" onclick="pressKey('7')">7</button>
+          <button type="button" onclick="pressKey('8')">8</button>
+          <button type="button" onclick="pressKey('9')">9</button>
+          <button type="button" class="clear" onclick="clearPin()">⌫</button>
+          <button type="button" onclick="pressKey('0')">0</button>
+          <button type="submit" class="ok">✅</button>
+        </div>
+      </div>
+    </form>
+
+    <footer>Secure PIN entry powered by FastAPI 🔒</footer>
+  </div>
+
+  <script>
+    function pressKey(num) {
+      const pinInput = document.getElementById("pin-input");
+      if (pinInput.value.length < 6) {
+        pinInput.value += num;
+      }
+    }
+
+    function clearPin() {
+      const pinInput = document.getElementById("pin-input");
+      pinInput.value = pinInput.value.slice(0, -1);
+    }
+  </script>
+</body>
+</html>

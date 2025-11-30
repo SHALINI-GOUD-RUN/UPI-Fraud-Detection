@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Fraud Detection Payment</title>
+  <link rel="stylesheet" href="/static/style.css">
+</head>
+<body>
+  <div class="container">
+    <h1>💳 Secure Payment</h1>
+
+    <!-- ✅ Form submits normally to /predict -->
+    <form action="/predict" method="post">
+      <label>User ID:</label>
+      <input type="text" name="user_id" required>
+
+      <label>Device ID:</label>
+      <input type="text" name="device_id" required>
+
+      <label>Merchant ID:</label>
+      <input type="text" name="merchant_id" required>
+
+      <label>Amount:</label>
+      <input type="number" step="0.01" name="amount" required>
+
+      <button type="submit">💰 Pay</button>
+    </form>
+  </div>
+</body>
+</html>

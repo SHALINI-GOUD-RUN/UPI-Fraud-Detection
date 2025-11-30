@@ -1,0 +1,181 @@
+/* --------------- GLOBAL STYLES --------------- */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: "Poppins", sans-serif;
+  background: linear-gradient(135deg, #4facfe, #00f2fe);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 100vh;
+}
+
+/* --------------- CONTAINER BOX --------------- */
+.container {
+  background: white;
+  padding: 30px 25px;
+  border-radius: 16px;
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.15);
+  width: 350px;
+  text-align: center;
+  animation: fadeIn 0.8s ease;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+/* --------------- TITLES --------------- */
+h1 {
+  font-size: 1.5em;
+  color: #333;
+  margin-bottom: 20px;
+}
+
+/* --------------- FORM ELEMENTS --------------- */
+form {
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+}
+
+label {
+  font-weight: 600;
+  text-align: left;
+  margin-top: 10px;
+  margin-bottom: 4px;
+  color: #444;
+}
+
+input {
+  padding: 10px 12px;
+  font-size: 1em;
+  border-radius: 8px;
+  border: 1px solid #ccc;
+  outline: none;
+  transition: border 0.3s ease, box-shadow 0.3s ease;
+}
+
+input:focus {
+  border-color: #4facfe;
+  box-shadow: 0 0 4px rgba(79, 172, 254, 0.5);
+}
+
+/* --------------- BUTTONS --------------- */
+button {
+  background: linear-gradient(135deg, #4facfe, #00f2fe);
+  color: white;
+  padding: 12px;
+  margin-top: 20px;
+  border: none;
+  border-radius: 10px;
+  font-weight: 600;
+  font-size: 1em;
+  cursor: pointer;
+  transition: background 0.3s ease, transform 0.1s ease;
+}
+
+button:hover {
+  background: linear-gradient(135deg, #00c6ff, #0072ff);
+  transform: scale(1.03);
+}
+
+/* --------------- ALERTS --------------- */
+.alert {
+  background: #ffe4e4;
+  color: #d9534f;
+  padding: 10px;
+  border-radius: 6px;
+  margin-top: 10px;
+  font-weight: 500;
+}
+
+/* --------------- PIN INPUT --------------- */
+#pin-form input[type="password"] {
+  text-align: center;
+  letter-spacing: 6px;
+  font-size: 1.4em;
+}
+
+/* --------------- FOOTER OR NOTES --------------- */
+footer {
+  margin-top: 10px;
+  font-size: 0.85em;
+  color: #777;
+}
+
+
+/* --------------- NUMERIC KEYPAD --------------- */
+.keypad {
+  margin-top: 25px;
+}
+
+.keys {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 12px;
+}
+
+.keys button {
+  padding: 15px 0;
+  font-size: 1.3em;
+  border: none;
+  border-radius: 10px;
+  background: #f1f1f1;
+  transition: background 0.2s, transform 0.1s;
+}
+
+.keys button:hover {
+  background: #e0e0e0;
+  transform: scale(1.05);
+}
+
+.keys button.ok {
+  background: linear-gradient(135deg, #4facfe, #00f2fe);
+  color: white;
+  font-weight: bold;
+}
+
+.keys button.clear {
+  background: #ffd4d4;
+  color: #d9534f;
+  font-weight: bold;
+}
+
+/* ---------------- SUCCESS PAGE ---------------- */
+.success-box {
+  text-align: center;
+  background: #f6fff9;
+  padding: 40px;
+  border-radius: 15px;
+  box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+}
+
+.success-box h1 {
+  color: #1cc88a;
+  font-size: 2em;
+}
+
+.success-box p.amount {
+  font-size: 1.5em;
+  margin: 10px 0 20px;
+}
+
+.success-box .btn {
+  background: linear-gradient(135deg, #4facfe, #00f2fe);
+  color: white;
+  padding: 10px 20px;
+  border-radius: 8px;
+  text-decoration: none;
+  font-weight: bold;
+  transition: 0.2s;
+}
+
+.success-box .btn:hover {
+  background: linear-gradient(135deg, #00f2fe, #4facfe);
+}

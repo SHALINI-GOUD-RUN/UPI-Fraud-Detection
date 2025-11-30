@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>⚠ Suspicious Transaction Alert</title>
+  <link rel="stylesheet" href="{{ url_for('static', path='style.css') }}">
+  <style>
+    body {
+      background-color: #fdf6f6;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      margin: 0;
+    }
+    .alert-box {
+      background-color: #fff;
+      border: 2px solid #ff6b6b;
+      border-radius: 15px;
+      padding: 40px 50px;
+      box-shadow: 0 0 15px rgba(255, 0, 0, 0.1);
+      text-align: center;
+      max-width: 450px;
+    }
+    h1 {
+      color: #d9534f;
+      font-size: 1.8em;
+      margin-bottom: 10px;
+    }
+    p {
+      color: #333;
+      font-size: 1em;
+      margin: 8px 0;
+    }
+    .note {
+      color: #ff0000;
+      font-weight: 600;
+      margin: 15px 0 25px 0;
+      background-color: #fff0f0;
+      border: 1px solid #ffcccc;
+      padding: 10px;
+      border-radius: 8px;
+    }
+    .details {
+      text-align: left;
+      background-color: #f8f8f8;
+      padding: 15px;
+      border-radius: 8px;
+      margin-bottom: 25px;
+      border: 1px solid #eee;
+    }
+    .details p {
+      margin: 4px 0;
+      font-size: 0.95em;
+    }
+    .btn-group {
+      display: flex;
+      justify-content: space-between;
+    }
+    button {
+      padding: 10px 25px;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      font-size: 1em;
+      transition: background-color 0.3s ease;
+    }
+    .yes-btn {
+      background-color: #007bff;
+      color: white;
+    }
+    .yes-btn:hover {
+      background-color: #0056b3;
+    }
+    .no-btn {
+      background-color: #dc3545;
+      color: white;
+    }
+    .no-btn:hover {
+      background-color: #a71d2a;
+    }
+  </style>
+</head>
+<body>
+  <div class="alert-box">
+    <h1>⚠ Suspicious Transaction Detected</h1>
+    
+    <div class="details">
+      <p><strong>Sender (User ID):</strong> {{ user_id }}</p>
+      <p><strong>Receiver (Merchant ID):</strong> {{ merchant_id }}</p>
+      <p><strong>Device ID:</strong> {{ device_id }}</p>
+      <p><strong>Amount:</strong> ₹{{ '%.2f'|format(amount) }}</p>
+    </div>
+
+    <form action="/confirm" method="post">
+      <input type="hidden" name="user_id" value="{{ user_id }}">
+      <input type="hidden" name="merchant_id" value="{{ merchant_id }}">
+      <input type="hidden" name="device_id" value="{{ device_id }}">
+      <input type="hidden" name="amount" value="{{ amount }}">
+
+      <div class="btn-group">
+        <button type="submit" name="decision" value="yes" class="yes-btn">✅ Continue</button>
+        <button type="submit" name="decision" value="no" class="no-btn">❌ Cancel</button>
+      </div>
+    </form>
+  </div>
+</body>
+</html>

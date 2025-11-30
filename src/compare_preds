@@ -1,0 +1,98 @@
+
+# -------------------- COMPARE_PREDS.PY --------------------
+import torch
+import pandas as pd
+
+print("📦 Loading trained model and graph...")
+
+# -------------------- LOAD GRAPH + MAPPINGS --------------------
+obj = torch.load("data/graph_with_feats.pt", weights_only=False)
+data = obj['hetero_data']
+u_map = obj.get('user_map', {})
+m_map = obj.get('merchant_map', {})
+
+# 🔁 ADD SELF-LOOPS (same as in train.py)
+for node_type in data.node_types:
+    dst_edges = [e for e in data.edge_types if e[2] == node_type]
+    if not dst_edges:
+        num_nodes = data[node_type].num_nodes
+        edge_index = torch.arange(num_nodes, dtype=torch.long).unsqueeze(0).repeat(2, 1)
+        data[(node_type, 'self_loop', node_type)].edge_index = edge_index
+
+# -------------------- LOAD TRAINED MODEL --------------------
+checkpoint = torch.load("model/edge_gnn.pth", map_location='cpu')
+metadata = checkpoint['metadata']
+
+from torch_geometric.nn import SAGEConv, to_hetero_with_bases
+
+class GNN(torch.nn.Module):
+    def __init__(self, hidden=64):
+        super().__init__()
+        self.conv1 = SAGEConv((-1, -1), hidden)
+        self.conv2 = SAGEConv((-1, -1), hidden)
+    def forward(self, x, edge_index):
+        x = self.conv1(x, edge_index).relu()
+        x = self.conv2(x, edge_index)
+        return x
+
+class EdgeClassifier(torch.nn.Module):
+    def __init__(self, metadata, hidden=64):
+        super().__init__()
+        self.gnn = to_hetero_with_bases(GNN(hidden), metadata=metadata, num_bases=3)
+        self.edge_mlp = torch.nn.Sequential(
+            torch.nn.Linear(2 * hidden, hidden),
+            torch.nn.ReLU(),
+            torch.nn.Linear(hidden, 2)
+        )
+    def forward(self, data):
+        h = self.gnn(data.x_dict, data.edge_index_dict)
+        u_idx, m_idx = data['user', 'pays', 'merchant'].edge_index
+        z = torch.cat([h['user'][u_idx], h['merchant'][m_idx]], dim=1)
+        return self.edge_mlp(z)
+
+# Instantiate and load weights
+model = EdgeClassifier(metadata, hidden=64)
+model.load_state_dict(checkpoint['model_state_dict'])
+model.eval()
+
+data = data.to('cpu')
+
+# -------------------- RUN INFERENCE --------------------
+print("⚙️  Running model inference...")
+with torch.no_grad():
+    logits = model(data)
+    probs = torch.softmax(logits, dim=1)[:, 1]  # Fraud probability
+    preds = (probs >= 0.5).int()
+
+edge_index = data['user', 'pays', 'merchant'].edge_index
+u_indices = edge_index[0].numpy()
+m_indices = edge_index[1].numpy()
+
+# -------------------- MAP BACK TO ORIGINAL IDS --------------------
+reverse_u_map = {v: k for k, v in u_map.items()}
+reverse_m_map = {v: k for k, v in m_map.items()}
+
+fraud_mask = preds == 1
+fraud_users = [reverse_u_map.get(int(u_indices[i]), f"U{i}") for i in range(len(fraud_mask)) if fraud_mask[i]]
+fraud_merchants = [reverse_m_map.get(int(m_indices[i]), f"M{i}") for i in range(len(fraud_mask)) if fraud_mask[i]]
+
+unique_fraud_users = sorted(set(fraud_users))
+unique_fraud_merchants = sorted(set(fraud_merchants))
+
+print(f"\n🧾 Total fraud edges detected: {fraud_mask.sum().item()}")
+print(f"👤 Unique fraudulent users: {len(unique_fraud_users)}")
+print(f"🏪 Unique fraudulent merchants: {len(unique_fraud_merchants)}")
+
+# -------------------- SAVE RESULTS --------------------
+results_df = pd.DataFrame({
+    'user_id': fraud_users,
+    'merchant_id': fraud_merchants
+})
+results_df.to_csv("results/predicted_fraud_edges.csv", index=False)
+pd.DataFrame({'user_id': unique_fraud_users}).to_csv("results/fraud_users.csv", index=False)
+pd.DataFrame({'merchant_id': unique_fraud_merchants}).to_csv("results/fraud_merchants.csv", index=False)
+
+print("\n✅ Results saved:")
+print(" - results/predicted_fraud_edges.csv  (All fraud edges)")
+print(" - results/fraud_users.csv            (Unique users in frauds)")
+print(" - results/fraud_merchants.csv        (Unique merchants in frauds)")
